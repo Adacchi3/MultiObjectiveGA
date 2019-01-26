@@ -30,8 +30,8 @@ def fastNonDominatedSort(playerList)
   f = []
   i = 0
   (0..@PLAYER_LIST_SIZE - 1).each do |playerNum|
+    player = playerList[playerNum]
     (0..@PLAYER_LIST_SIZE - 1).each do |rivalNum|
-      player = playerList[playerNum]
       rival = playerList[rivalNum]
       if player.dominate(rival)
         s[playerNum] = [] if s[playerNum] == 0
@@ -127,6 +127,7 @@ if $PROGRAM_NAME == __FILE__
   charaList << Yuu.new
 
   playerList = []
+  elitePlayerList = []
   (1..@PLAYER_LIST_SIZE).each do |_pNum|
     player = Player.new
     genes = createGenes
