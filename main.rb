@@ -16,9 +16,11 @@ def createGenes
 end
 
 def selecteElites(playerList)
-  sortedList = playerList.sort { |a, b| (a.evalValue <=> b.evalValue) }
+  # sortedList = playerList.sort { |a, b| (a.evalValue <=> b.evalValue) }
   sortedList = fastNonDominatedSort(playerList)
-  elites = sortedList.drop(@DROP_GENES_SIZE)
+  # elites = sortedList.drop(@DROP_GENES_SIZE)
+  elites = sortedList.slice(0..@ELITE_PLAYER_SIZE)
+  elites
 end
 
 # TODO: fast non-dominated sortのアルゴリズムで用いられていた1文字変数をそのまま使っているので，
@@ -40,39 +42,49 @@ def fastNonDominatedSort(playerList)
         n[playerNum] += 1
       end
     end
-    next unless n[playerNum] == 0
-
-    rank[playerNum] = 1
-    f[i] = [] if f[i].nil?
-    f[i] << player
+    if n[playerNum] == 0
+      rank[playerNum] = 1
+      f[i] = [] if f[i].nil?
+      f[i] << player
+    end
   end
-  while f[i].size < 0
+  while f[i].size > 0
     q = []
     f[i].each do |player|
       playerNum = playerList.index(player)
-      s[playerNum].each do |rival|
-        rivalNum = playerList.index(rival)
-        n[rivalNum] -= 1
-        if n[rivalNum] == 0
-          rank[rivalNum] = i + 1
-          q << rival
+      if s[playerNum] != 0
+        s[playerNum].each do |rival|
+          rivalNum = playerList.index(rival)
+          n[rivalNum] -= 1
+          if n[rivalNum] == 0
+            rank[rivalNum] = i + 1
+            q << rival
+          end
         end
       end
     end
     i += 1
     f[i] = q
   end
-  f.each do |nonDominatedPlayerList|
-    nonDominatedPlayerList.each do |player|
-      playerList.delete(player)
-    end
-  end
+  eliteList = []
   f.reverse_each do |nonDominatedPlayerList|
     nonDominatedPlayerList.each do |player|
-      playerList.push(player)
+      eliteList.push(player)
     end
   end
-  playerList
+  eliteList
+  # f.each do |nonDominatedPlayerList|
+  #   # puts nonDominatedPlayerList.size
+  #   nonDominatedPlayerList.each do |player|
+  #     playerList.delete(player)
+  #   end
+  # end
+  # f.reverse_each do |nonDominatedPlayerList|
+  #   nonDominatedPlayerList.each do |player|
+  #     playerList.push(player)
+  #   end
+  # end
+  # playerList
 end
 
 def crossover(player1, player2)
@@ -91,11 +103,16 @@ def crossover(player1, player2)
 end
 
 def createNextPlayerList(currentPlayerList, elitePlayerList, progenyPlayerList)
-  nextPlayerList = currentPlayerList.sort { |a, b| (a.evalValue <=> b.evalValue) }
-  nextPlayerList = nextPlayerList.drop(elitePlayerList.size + progenyPlayerList.size)
+  currentPlayerList.sort { |a, b| (a.evalValue <=> b.evalValue) }
+  # nextPlayerList = nextPlayerList.drop(elitePlayerList.size + progenyPlayerList.size)
+  nextPlayerList = []
   nextPlayerList.concat(elitePlayerList)
   nextPlayerList.concat(progenyPlayerList)
-  nextPlayerList
+  nextPlayerList.each do |player|
+    currentPlayerList.delete(player)
+  end
+  drop_size = @PLAYER_LIST_SIZE - nextPlayerList.size
+  nextPlayerList.concat(currentPlayerList.slice(0..drop_size-1))
 end
 
 def mutation(playerList)
@@ -124,7 +141,7 @@ if $PROGRAM_NAME == __FILE__
   charaList = []
   charaList << Aki.new
   charaList << Rizumi.new
-  charaList << Yuu.new
+  # charaList << Yuu.new
 
   playerList = []
   elitePlayerList = []
@@ -143,6 +160,7 @@ if $PROGRAM_NAME == __FILE__
         player.favoritedValues << chara.eval(player)
       end
       player.evalValue = player.favoritedValues.sum / player.favoritedValues.size
+      # player.evalValue = player.favoritedValues.max
     end
     elitePlayerList = selecteElites(playerList)
     progenyPlayerList = []
@@ -157,17 +175,30 @@ if $PROGRAM_NAME == __FILE__
       evalValues << player.evalValue
     end
 
-    puts "---第#{generationCount}世代の結果---"
-    puts "AVG: #{evalValues.inject(0.0) { |r, i| r += i } / evalValues.size}"
-    puts "Max: #{evalValues.max}"
-    puts "Min: #{evalValues.min}"
-    puts ''
+    # puts "---第#{generationCount}世代の結果---"
+    # puts "AVG: #{evalValues.inject(0.0) { |r, i| r += i } / evalValues.size}"
+    # puts "Max: #{evalValues.max}"
+    # puts "Min: #{evalValues.min}"
+    # puts ''
+    puts "#{generationCount}, #{evalValues.inject(0.0) { |r, i| r += i } / evalValues.size}, #{evalValues.max}"
 
     playerList = nextPlayerList
   end
-  bestPlayer = elitePlayerList[19]
-  puts "最も優れたプレイヤーの行動履歴は#{bestPlayer.genes}"
+  # bestPlayer = elitePlayerList[19]
+  # puts "最も優れたプレイヤーの行動履歴は#{bestPlayer.genes}"
+  # (0..charaList.size - 1).each do |charaNum|
+  #   puts "#{charaList[charaNum].name}の好感度： #{bestPlayer.favoritedValues[charaNum]}"
+  # end
+  charaName = "playerName, "
   (0..charaList.size - 1).each do |charaNum|
-    puts "#{charaList[charaNum].name}の好感度： #{bestPlayer.favoritedValues[charaNum]}"
+    charaName += "#{charaList[charaNum].name}, "
+  end
+  puts charaName
+  elitePlayerList.each do |player|
+    result = "#{player.name}, "
+    (0..charaList.size - 1).each do |charaNum|
+      result += "#{player.favoritedValues[charaNum]}, "
+    end
+    puts result
   end
 end

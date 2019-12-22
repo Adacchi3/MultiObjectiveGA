@@ -3,9 +3,9 @@ class Aki < AbstractCharacter
 
   def initialize
     @name = 'Aki Koriyama'
-    @health = 10
+    @health = 1
     @humanity = 1
-    @science = 10
+    @science = 1
     @sport = 1
     @art = 1
   end

@@ -3,11 +3,11 @@ class Rizumi < AbstractCharacter
 
   def initialize
     @name = 'Rizumi Kyono'
-    @health = 10
+    @health = 1
     @humanity = 1
     @science = 1
     @sport = 1
-    @art = 10
+    @art = 1
   end
 
   def eval(chara)

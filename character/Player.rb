@@ -1,6 +1,6 @@
 class Player < AbstractCharacter
   attr_reader :name, :health, :humanity, :science, :sport, :art, :genes
-  attr_accessor :evalValue, :favoritedValues
+  attr_accessor :name, :evalValue, :favoritedValues
 
   def initialize
     @name = (0...5).map { ('A'..'Z').to_a[rand(26)] }.join
