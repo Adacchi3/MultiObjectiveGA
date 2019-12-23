@@ -3,14 +3,14 @@ class Aki < AbstractCharacter
 
   def initialize
     @name = 'Aki Koriyama'
-    @health = 1
+    @health = 10
     @humanity = 1
-    @science = 1
+    @science = 10
     @sport = 1
     @art = 1
   end
 
   def eval(chara)
-    (sigmoid(chara.health - @health) + sigmoid(chara.science - @science)) / 2
+    sigmoid(chara.science.to_f/chara.genes.size)
   end
 end

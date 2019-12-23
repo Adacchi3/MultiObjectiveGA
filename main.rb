@@ -141,7 +141,8 @@ if $PROGRAM_NAME == __FILE__
   charaList = []
   charaList << Aki.new
   charaList << Rizumi.new
-  # charaList << Yuu.new
+  charaList << Yuu.new
+  charaList << Tsugumi.new
 
   playerList = []
   elitePlayerList = []

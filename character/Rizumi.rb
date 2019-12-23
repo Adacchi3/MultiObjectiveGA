@@ -3,14 +3,14 @@ class Rizumi < AbstractCharacter
 
   def initialize
     @name = 'Rizumi Kyono'
-    @health = 1
+    @health = 10
     @humanity = 1
     @science = 1
     @sport = 1
-    @art = 1
+    @art = 10
   end
 
   def eval(chara)
-    (sigmoid(chara.health - @health) + sigmoid(chara.art - @art)) / 2
+    sigmoid(chara.art.to_f/chara.genes.size)
   end
 end
